@@ -1,6 +1,6 @@
 #include "main.h"
 #include "stdio.h"
-
+/***by zpw33  by me/
 static uint32_t can_count = 0;
 
 volatile Encoder CM1Encoder = {0,0,0,0,0,0,0,0,0};
@@ -24,7 +24,7 @@ float ZGyroModuleAngle = 0.0f;
 void GetEncoderBias(volatile Encoder *v, CanRxMsg * msg)
 {
 
-            v->ecd_bias = (msg->Data[0]<<8)|msg->Data[1];  //±£´æ³õÊ¼±àÂëÆ÷Öµ×÷ÎªÆ«²î  
+            v->ecd_bias = (msg->Data[0]<<8)|msg->Data[1];  //ä¿å­˜åˆå§‹ç¼–ç å™¨å€¼ä½œä¸ºåå·®  
             v->ecd_value = v->ecd_bias;
             v->last_raw_value = v->ecd_bias;
             v->temp_count++;
@@ -47,7 +47,7 @@ void EncoderProcess(volatile Encoder *v, CanRxMsg * msg)
 	v->last_raw_value = v->raw_value;
 	v->raw_value = (msg->Data[0]<<8)|msg->Data[1];
 	v->diff = v->raw_value - v->last_raw_value;
-	if(v->diff < -7500)    //Á½´Î±àÂëÆ÷µÄ·´À¡Öµ²î±ğÌ«´ó£¬±íÊ¾È¦Êı·¢ÉúÁË¸Ä±ä
+	if(v->diff < -7500)    //ä¸¤æ¬¡ç¼–ç å™¨çš„åé¦ˆå€¼å·®åˆ«å¤ªå¤§ï¼Œè¡¨ç¤ºåœˆæ•°å‘ç”Ÿäº†æ”¹å˜
 	{
 		v->round_cnt++;
 		v->ecd_raw_rate = v->diff + 8192;
@@ -61,16 +61,16 @@ void EncoderProcess(volatile Encoder *v, CanRxMsg * msg)
 	{
 		v->ecd_raw_rate = v->diff;
 	}
-	//¼ÆËãµÃµ½Á¬ĞøµÄ±àÂëÆ÷Êä³öÖµ
+	//è®¡ç®—å¾—åˆ°è¿ç»­çš„ç¼–ç å™¨è¾“å‡ºå€¼
 	v->ecd_value = v->raw_value + v->round_cnt * 8192;
-	//¼ÆËãµÃµ½½Ç¶ÈÖµ£¬·¶Î§Õı¸ºÎŞÇî´ó
+	//è®¡ç®—å¾—åˆ°è§’åº¦å€¼ï¼ŒèŒƒå›´æ­£è´Ÿæ— ç©·å¤§
 	v->ecd_angle = (float)(v->raw_value - v->ecd_bias)*360/8192 + v->round_cnt * 360;
 	v->rate_buf[v->buf_count++] = v->ecd_raw_rate;
 	if(v->buf_count == RATE_BUF_SIZE)
 	{
 		v->buf_count = 0;
 	}
-	//¼ÆËãËÙ¶ÈÆ½¾ùÖµ
+	//è®¡ç®—é€Ÿåº¦å¹³å‡å€¼
 	for(i = 0;i < RATE_BUF_SIZE; i++)
 	{
 		temp_sum += v->rate_buf[i];
@@ -96,7 +96,7 @@ void CanReceiveMsgProcess(CanRxMsg * msg)
 				case CAN_BUS2_MOTOR1_FEEDBACK_MSG_ID:
 				{
 					//LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_MOTOR1));
-					(can_count<=50) ? GetEncoderBias(&CM1Encoder ,msg):EncoderProcess(&CM1Encoder ,msg);       //»ñÈ¡µ½±àÂëÆ÷µÄ³õÊ¼Æ«²îÖµ            
+					(can_count<=50) ? GetEncoderBias(&CM1Encoder ,msg):EncoderProcess(&CM1Encoder ,msg);       //è·å–åˆ°ç¼–ç å™¨çš„åˆå§‹åå·®å€¼            
                     
 				}break;
 				case CAN_BUS2_MOTOR2_FEEDBACK_MSG_ID:
@@ -124,14 +124,14 @@ void CanReceiveMsgProcess(CanRxMsg * msg)
 				}
 		}
 		// check if deadlock, meeans the yaw angle is overflow //time should keep for a long time to avoid bug		
-			if(!LostCounterOverflowCheck(fabs(GMYawEncoder.ecd_angle), 70.0f) || GetWorkState() == STOP_STATE)  //Èç¹ûÊÇÍ£Ö¹Ä£Ê½£¬Ò»Ö±Î¹¹··ÀÖ¹ÖØĞÂÆô¶¯Ê§°Ü
+			if(!LostCounterOverflowCheck(fabs(GMYawEncoder.ecd_angle), 70.0f) || GetWorkState() == STOP_STATE)  //å¦‚æœæ˜¯åœæ­¢æ¨¡å¼ï¼Œä¸€ç›´å–‚ç‹—é˜²æ­¢é‡æ–°å¯åŠ¨å¤±è´¥
 			{
 				//LostCounterFeed(GetLostCounter(LOST_COUNTER_INDEX_DEADLOCK));
 			}		 
 }
 
 /********************************************************************************
-   ¸øµ×ÅÌµçµ÷°å·¢ËÍÖ¸Áî£¬IDºÅÎª0x200£¸øµµ×ÅÌ·µ»ØIDÎª0x201-0x204
+   ç»™åº•ç›˜ç”µè°ƒæ¿å‘é€æŒ‡ä»¤ï¼ŒIDå·ä¸º0x200ï¼˜î‰ˆåº•ç›˜è¿”å›IDä¸º0x201-0x204
 *********************************************************************************/
 void Set_CM_Speed(CAN_TypeDef *CANx, int16_t cm1_iq, int16_t cm2_iq, int16_t cm3_iq, int16_t cm4_iq)
 {
@@ -153,8 +153,8 @@ void Set_CM_Speed(CAN_TypeDef *CANx, int16_t cm1_iq, int16_t cm2_iq, int16_t cm3
 }
 
 /********************************************************************************
-   ¸øµçµ÷°å·¢ËÍÖ¸Áî£¬IDºÅÎª0x1FF£¬Ö»ÓÃÁ½¸öµçµ÷°å£¬Êı¾İ»Ø´«IDÎª0x205ºÍ0x206
-	 cyq:¸ü¸ÄÎª·¢ËÍÈı¸öµçµ÷µÄÖ¸Áî¡£
+   ç»™ç”µè°ƒæ¿å‘é€æŒ‡ä»¤ï¼ŒIDå·ä¸º0x1FFï¼Œåªç”¨ä¸¤ä¸ªç”µè°ƒæ¿ï¼Œæ•°æ®å›ä¼ IDä¸º0x205å’Œ0x206
+	 cyq:æ›´æ”¹ä¸ºå‘é€ä¸‰ä¸ªç”µè°ƒçš„æŒ‡ä»¤ã€‚
 *********************************************************************************/
 void Set_Gimbal_Current(CAN_TypeDef *CANx, int16_t gimbal_yaw_iq, int16_t gimbal_pitch_iq)
 {
