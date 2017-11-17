@@ -3,7 +3,7 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'SYSU_RM' 
+ * Project: 'SYSU_RM(2)' 
  * Target:  'Target 1' 
  */
 
