@@ -1,6 +1,6 @@
 #include "main.h"
 #include "stdio.h"
-/***by zpw33/
+/***by zpw33  by me/
 static uint32_t can_count = 0;
 
 volatile Encoder CM1Encoder = {0,0,0,0,0,0,0,0,0};
